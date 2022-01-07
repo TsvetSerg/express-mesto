@@ -1,6 +1,6 @@
 const User = require('../models/user');
 
-module.exports.postUser = async (req, res) => {
+const postUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
 
@@ -18,4 +18,8 @@ module.exports.postUser = async (req, res) => {
 
     res.status(500).send({ message: 'Ошибка на сервере' });
   }
+};
+
+module.exports = {
+  postUser,
 };
