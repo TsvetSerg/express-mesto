@@ -6,7 +6,6 @@ const Card = require('../models/card');
 
 const postCards = async (req, res) => {
   const { name, link } = req.body;
-  console.log(req.body);
   try {
     const card = await Card.create({ name, link, owner: req.user._id });
     res.status(200).send(card);
