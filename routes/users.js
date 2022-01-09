@@ -1,10 +1,16 @@
 const routerUser = require('express').Router();
-const { postUser, getUser, getUserId, updateProfile, updateAvatar } = require('../controllers/users');
+const {
+  postUser,
+  getUser,
+  getUserId,
+  updateProfile,
+  updateAvatar
+} = require('../controllers/users');
 
-routerUser.get('/', getUser);
-routerUser.get('/:_id', getUserId);
-routerUser.post('/', postUser);
-routerUser.patch('/me', updateProfile);
-routerUser.patch('/me/avatar', updateAvatar);
+routerUser.get('/', getUser);   // Получить всех пользователлей
+routerUser.get('/:_id', getUserId);   // Получить пользователя по ID
+routerUser.post('/', postUser);   // Создать нового пользоватея
+routerUser.patch('/me', updateProfile);   // Обновление пользователя
+routerUser.patch('/me/avatar', updateAvatar);   // обновениие аватара
 
 module.exports = routerUser;

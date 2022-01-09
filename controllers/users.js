@@ -1,6 +1,6 @@
 const User = require('../models/user');
 
-const postUser = async (req, res) => {
+const postUser = async (req, res) => {              // Создаем пользователя
   try {
     const { name, about, avatar } = req.body;
 
@@ -8,9 +8,6 @@ const postUser = async (req, res) => {
 
     res.status(200).send(user);
   } catch (err) {
-    console.log(`ERROR: ${err.name}`);
-    console.log(`ERROR: ${err.message}`);
-
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Введены некорректные данные!' });
       return;
@@ -20,20 +17,17 @@ const postUser = async (req, res) => {
   }
 };
 
-const getUser = async (req, res) => {
+const getUser = async (req, res) => {       // Получаем всех пользователей
   try {
     const user = await User.find({});
 
     res.status(200).send(user);
   } catch (err) {
-    console.log(`ERROR: ${err.name}`);
-    console.log(`ERROR: ${err.message}`);
-
     res.status(500).send({ message: 'Ошибка на сервере' });
   }
 };
 
-const getUserId = async (req, res) => {
+const getUserId = async (req, res) => {         // Получаем пользоватея по ID
   const { _id } = req.params;
 
   try {
@@ -41,9 +35,6 @@ const getUserId = async (req, res) => {
 
     res.status(200).send(user);
   } catch (err) {
-    console.log(`ERROR: ${err.name}`);
-    console.log(`ERROR: ${err.message}`);
-
     if (err.name === 'CastError') {
       res.status(400).send({ message: `Данный id: ${_id} не найден` });
       return;
@@ -53,18 +44,15 @@ const getUserId = async (req, res) => {
   }
 };
 
-const updateProfile = async (req, res) => {
+const updateProfile = async (req, res) => {           // Обновление профия
   try {
     const { name, about, avatar } = req.body;
 
     const user = await User.findByIdAndUpdate(req.user._id, { name, about, avatar });
     res.status(200).send(user);
   } catch (err) {
-    console.log(`ERROR: ${err.name}`);
-    console.log(`ERROR: ${err.message}`);
-
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Введены некорректные данные!' });
+      res.status(400).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
       return;
     }
 
@@ -72,18 +60,15 @@ const updateProfile = async (req, res) => {
   }
 };
 
-const updateAvatar = async (req, res) => {
+const updateAvatar = async (req, res) => {              // Обновление аватара
   try {
     const { avatar } = req.body;
 
     const user = await User.findByIdAndUpdate(req.user._id, { avatar });
     res.status(200).send(user);
   } catch (err) {
-    console.log(`ERROR: ${err.name}`);
-    console.log(`ERROR: ${err.message}`);
-
     if (err.name === 'ValidationError') {
-      res.status(400).send({ message: 'Введены некорректные данные!' });
+      res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара.' });
       return;
     }
 
