@@ -44,8 +44,46 @@ const getUserId = async (req, res) => {
     console.log(`ERROR: ${err.name}`);
     console.log(`ERROR: ${err.message}`);
 
-    if (err.name === 'ValidationError') {
+    if (err.name === 'CastError') {
       res.status(400).send({ message: `Данный id: ${_id} не найден` });
+      return;
+    }
+
+    res.status(500).send({ message: 'Ошибка на сервере' });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const { name, about, avatar } = req.body;
+
+    const user = await User.findByIdAndUpdate(req.user._id, { name, about, avatar });
+    res.status(200).send(user);
+  } catch (err) {
+    console.log(`ERROR: ${err.name}`);
+    console.log(`ERROR: ${err.message}`);
+
+    if (err.name === 'ValidationError') {
+      res.status(400).send({ message: 'Введены некорректные данные!' });
+      return;
+    }
+
+    res.status(500).send({ message: 'Ошибка на сервере' });
+  }
+};
+
+const updateAvatar = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+
+    const user = await User.findByIdAndUpdate(req.user._id, { avatar });
+    res.status(200).send(user);
+  } catch (err) {
+    console.log(`ERROR: ${err.name}`);
+    console.log(`ERROR: ${err.message}`);
+
+    if (err.name === 'ValidationError') {
+      res.status(400).send({ message: 'Введены некорректные данные!' });
       return;
     }
 
@@ -57,4 +95,6 @@ module.exports = {
   postUser,
   getUser,
   getUserId,
+  updateProfile,
+  updateAvatar,
 };
