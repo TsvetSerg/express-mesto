@@ -48,7 +48,11 @@ const updateProfile = async (req, res) => {           // Обновление п
   try {
     const { name, about, avatar } = req.body;
 
-    const user = await User.findByIdAndUpdate(req.user._id, { name, about, avatar });
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about, avatar },
+      { new: true, runValidators: true },
+    );
     res.status(200).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
@@ -64,7 +68,11 @@ const updateAvatar = async (req, res) => {              // Обновление 
   try {
     const { avatar } = req.body;
 
-    const user = await User.findByIdAndUpdate(req.user._id, { avatar });
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true, runValidators: true },
+    );
     res.status(200).send(user);
   } catch (err) {
     if (err.name === 'ValidationError') {
