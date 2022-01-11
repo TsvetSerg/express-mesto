@@ -1,5 +1,6 @@
 const Card = require('../models/card');
 const mongoose = require('mongoose');
+const NotFoundError = require('../errors/not-found');
 
 const postCards = async (req, res) => {         //Создаем картооочку
   const { name, link } = req.body;
@@ -29,20 +30,33 @@ const getCards = async (req, res) => {        //Получаем все карт
     res.status(500).send({ message: 'Ошибка на сервере' });
   }
 };
-const deleteCards = async (req, res) => {       //Удаляем карточку
-  try {
-    const { _id } = req.params;
+const deleteCards = (req, res) => {       //Удаляем карточку
+  const { _id } = req.params;
+  Card.findById(_id)
+    .orFail(() => new NotFoundError('NotFound'))
+    .then((card) => {
+      card.remove();   // ничего умней честно говоря нне придумал)))))
+      res.status(200).send({ message: 'Карточка удалена.' })
+    })
+    .catch((err) => {
+      if (err.message === 'NotFound') {
+        return res.status(404).send({ message: 'Карточка с указанным _id не найдена.' })
+      }
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Переданы некорректные данные.' })
+      }
+    })
 
-    const card = await Card.findByIdAndRemove(_id);
-    res.status(200).send(card);
-  } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(404).send({ message: 'Карточка с указанным id не найдена.' });
-      return;
-    }
-
-    res.status(500).send({ message: 'Ошибка на сервере' });
-  }
+    // .then((card) => {
+    //   if (!card) {
+    //     return res.status(404).send({ message: 'Передан несуществующий id карточки.' });
+    //   }
+    //   return res.status(200).send({ message: 'Карточка удалена' });
+    // })
+    // .catch((err) => { res.status(500).send({ message: 'Ошибка на сервере' })
+    // });
+  // Card.findByIdAndRemove(_id)
+  // res.status(200).send({ message: 'Elftaasd' })
 };
 
 const likedCards = (req, res) => {                //Лайк на карточку
