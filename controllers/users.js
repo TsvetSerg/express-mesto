@@ -34,6 +34,9 @@ const getUserId = (req, res) => {         // Получаем пользоват
     .orFail(() => new NotFoundError('NotFound'))
     .then((user) => res.status(200).send(user))
     .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Переданы некорректные данные.' });
+      }
       if (err.message === 'NotFound') {
         return res.status(404).send({ message: `Данный id: ${_id} не найден` });
       }
