@@ -45,18 +45,7 @@ const deleteCards = (req, res) => {       //Удаляем карточку
       if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Переданы некорректные данные.' })
       }
-    })
-
-    // .then((card) => {
-    //   if (!card) {
-    //     return res.status(404).send({ message: 'Передан несуществующий id карточки.' });
-    //   }
-    //   return res.status(200).send({ message: 'Карточка удалена' });
-    // })
-    // .catch((err) => { res.status(500).send({ message: 'Ошибка на сервере' })
-    // });
-  // Card.findByIdAndRemove(_id)
-  // res.status(200).send({ message: 'Elftaasd' })
+    });
 };
 
 const likedCards = (req, res) => {                //Лайк на карточку
@@ -65,9 +54,10 @@ const likedCards = (req, res) => {                //Лайк на карточк
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => new NotFoundError('NotFound'))
     .then((like) => res.status(200).send({ data: like }))
     .catch((err) => {
-      if (err.message === '404') {
+      if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Передан несуществующий id карточки.' });
       }
       if (err.name === 'CastError') {
@@ -83,9 +73,10 @@ const dislikeCards = (req, res) => {              // Удаяем лайк
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
+    .orFail(() => new NotFoundError('NotFound'))
     .then((dislike) => res.status(200).send({ data: dislike }))
     .catch((err) => {
-      if (err.message === '404') {
+      if (err.message === 'NotFound') {
         return res.status(404).send({ message: 'Передан несуществующий id карточки.' });
       }
       if (err.name === 'CastError') {

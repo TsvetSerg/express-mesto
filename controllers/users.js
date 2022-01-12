@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found');
 
 const postUser = async (req, res) => {              // Создаем пользователя
   try {
@@ -27,21 +28,18 @@ const getUser = async (req, res) => {       // Получаем всех пол�
   }
 };
 
-const getUserId = async (req, res) => {         // Получаем пользоватея по ID
+const getUserId = (req, res) => {         // Получаем пользоватея по ID
   const { _id } = req.params;
+  User.findById(_id)
+    .orFail(() => new NotFoundError('NotFound'))
+    .then((user) => res.status(200).send(user))
+    .catch((err) => {
+      if (err.message === 'NotFound') {
+        return res.status(404).send({ message: `Данный id: ${_id} не найден` });
+      }
 
-  try {
-    const user = await User.findById(_id)
-
-    res.status(200).send(user);
-  } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(400).send({ message: `Данный id: ${_id} не найден` });
-      return;
-    }
-
-    res.status(500).send({ message: 'Ошибка на сервере' });
-  }
+      return res.status(500).send({ message: 'Ошибка на сервере' });
+    });
 };
 
 const updateProfile = async (req, res) => {           // Обновление профия
