@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const postUser = (req, res) => {              // Создаем пользователя
   try {
@@ -89,22 +90,13 @@ const updateAvatar = async (req, res) => {              // Обновление 
 
 const login = (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email })
-    .orFail(() => new NotFoundError('NotFound'))
-    .then((user) => { bcrypt.compare(password, user.password);
-    })
-    .then((matched) => {
-      if (!matched) {
-        return Promise.reject(new NotFoundError('NotFound'));
-      }
-      res.send({ message: 'Всё верно!' });
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
     })
     .catch((err) => {
-      if (err.massage === 'NotFound') {
-        res.status(401).send({ message: 'Неправильные почта или пароль' });
-      }
-
-      res.status(500).send({ message: 'Ошибка на сервере' });
+      res.status(401).send({ message: err.message })
     })
 };
 

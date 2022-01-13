@@ -9,7 +9,7 @@ const {
 
 routerUser.get('/', getUser);   // Получить всех пользователлей
 routerUser.get('/:_id', getUserId);   // Получить пользователя по ID
-routerUser.post('/', postUser);   // Создать нового пользоватея
+// routerUser.post('/', postUser);   // Создать нового пользоватея
 routerUser.patch('/me', updateProfile);   // Обновление пользователя
 routerUser.patch('/me/avatar', updateAvatar);   // обновениие аватара
 
