@@ -1,13 +1,15 @@
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found');
+const bcrypt = require('bcryptjs');
 
-const postUser = async (req, res) => {              // Создаем пользователя
+const postUser = (req, res) => {              // Создаем пользователя
   try {
-    const { name, about, avatar } = req.body;
-
-    const user = await User.create({ name, about, avatar });
-
-    res.status(200).send(user);
+    const { name, about, avatar, email, password } = req.body;
+    bcrypt.hash(req.body.password, 10)
+      .then((hash) => {
+        const user = User.create({ name, about, avatar, email, password: hash });
+        res.status(200).send(user);
+      });
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Введены некорректные данные!' });
@@ -85,10 +87,32 @@ const updateAvatar = async (req, res) => {              // Обновление 
   }
 };
 
+const login = (req, res) => {
+  const { email, password } = req.body;
+  User.findOne({ email })
+    .orFail(() => new NotFoundError('NotFound'))
+    .then((user) => { bcrypt.compare(password, user.password);
+    })
+    .then((matched) => {
+      if (!matched) {
+        return Promise.reject(new NotFoundError('NotFound'));
+      }
+      res.send({ message: 'Всё верно!' });
+    })
+    .catch((err) => {
+      if (err.massage === 'NotFound') {
+        res.status(401).send({ message: 'Неправильные почта или пароль' });
+      }
+
+      res.status(500).send({ message: 'Ошибка на сервере' });
+    })
+};
+
 module.exports = {
   postUser,
   getUser,
   getUserId,
   updateProfile,
   updateAvatar,
+  login,
 };

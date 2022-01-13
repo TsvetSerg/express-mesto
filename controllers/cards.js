@@ -31,7 +31,7 @@ const deleteCards = (req, res) => {       //Удаляем карточку
   Card.findById(_id)
     .orFail(() => new NotFoundError('NotFound'))
     .then((card) => {
-      card.remove();   // ничего умней честно говоря нне придумал)))))
+      card.remove();
       res.status(200).send({ message: 'Карточка удалена.' })
     })
     .catch((err) => {
