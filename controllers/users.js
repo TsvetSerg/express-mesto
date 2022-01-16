@@ -2,6 +2,9 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const loginError = require('../errors/loginError');
+
+const { JWT_SECRET = 'DEFAULT_JWT' } = process.env;
 
 const postUser = (req, res) => {              // Создаем пользователя
   try {
@@ -88,16 +91,32 @@ const updateAvatar = async (req, res) => {              // Обновление 
   }
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials({ email, password })
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res.send({ token });
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message })
+      next(err);
     })
+};
+
+const getProfile = (req, res) => {
+  User.findById(req.user._id)
+    .orFail(() => new NotFoundError('NotFound'))
+    .then((user) => res.status(200).send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Переданы некорректные данные.' });
+      }
+      if (err.message === 'NotFound') {
+        return res.status(404).send({ message: `Данный id не найден` });
+      }
+
+      return res.status(500).send({ message: 'Ошибка на сервере' });
+    });
 };
 
 module.exports = {
@@ -107,4 +126,5 @@ module.exports = {
   updateProfile,
   updateAvatar,
   login,
+  getProfile,
 };
