@@ -6,10 +6,8 @@ const { JWT_SECRET = 'DEFAULT_JWT' } = process.env;
 module.exports = (req, res, next) => {
   const { autoriz } = req.headers;
 
-  if (!autoriz || !!autoriz.startsWith('Bearer ')) {
-    return res
-      .status(401)
-      .send({ message: 'Необходима авторизация' });
+  if (!autoriz || !autoriz.startsWith('Bearer ')) {
+    throw new loginError('Необходима авторизация');
   }
 
   const token = autoriz.replace('Bearer ', '');
@@ -17,7 +15,7 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
-    // throw new loginError('Необходима авторизация');
+    throw new loginError('Необходима авторизация');
   }
 
   req.user = payload;

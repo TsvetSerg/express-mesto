@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const routes = require('./routes');
 const { postUser, login } = require('./controllers/users');
-const auth = require('./middlewares/auth')
+const auth = require('./middlewares/auth');
+const handelError = require('./middlewares/handelError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -16,13 +17,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   // useFindAndModify: false,
 });
 
-
 app.post('/signin', login);
 app.post('/signup', postUser);
 
-// app.use(auth);
+app.use(auth);
 
 app.use(routes);
 app.use(express.json());
+app.use(handelError);
 
 app.listen(PORT);
