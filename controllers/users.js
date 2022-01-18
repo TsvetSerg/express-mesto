@@ -12,11 +12,12 @@ const postUser = (req, res, next) => {              // Создаем польз
   const { name, about, avatar, email, password } = req.body;
   bcrypt.hash(req.body.password, 10)
     .then((hash) => {
-      const user = User.create({ name, about, avatar, email, password: hash });
-      res.status(200).send(user);
+      return User.create({ name, about, avatar, email, password: hash });
     })
+    .then((data) => res.status(201).send(data))
     .catch((err) => {
-      if (err.name === 'MongoServerError' && err.code === '11000') {
+      // console.log(err)
+      if (err.name === 'MongoServerError' && err.code === 11000) {
         next(new ConflictError('Пользователь с данным email уже существует'));
       }
       if (err.name === 'ValidationError') {
