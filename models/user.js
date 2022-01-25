@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator: (url) => /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})([/\w\W.-]*)#?$/g.test(url),
       message: 'Некорректный URL',
-    }
+    },
   },
   email: {
     type: String,
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.findUserByCredentials = function ({ email, password }) {
+userSchema.statics.findUserByCredentials = function validFunc({ email, password }) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {

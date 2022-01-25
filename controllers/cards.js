@@ -1,9 +1,9 @@
 const Card = require('../models/card');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const NotFoundError = require('../errors/not-found');
 const BadRequest = require('../errors/BadRequest');
 
-const postCards = async (req, res, next) => {         //Создаем картооочку
+const postCards = async (req, res, next) => { // Создаем картооочку
   const { name, link } = req.body;
   try {
     const card = await Card.create({ name, link, owner: req.user._id });
@@ -16,7 +16,7 @@ const postCards = async (req, res, next) => {         //Создаем карт�
   }
 };
 
-const getCards = async (req, res, next) => {        //Получаем все картоки с сервера
+const getCards = async (req, res, next) => { // Получаем все картоки с сервера
   try {
     const card = await Card.find({});
 
@@ -25,14 +25,14 @@ const getCards = async (req, res, next) => {        //Получаем все к
     next(err);
   }
 };
-const deleteCards = (req, res, next) => {       //Удаляем карточку
+const deleteCards = (req, res, next) => { // Удаляем карточку
   const { _id } = req.params;
   Card.findById(_id)
     .orFail(() => new Error('NotFound'))
     .then((card) => {
       if (req.user._id.toString() === card.owner.toString()) {
         card.remove();
-        res.status(200).send({ message: 'Карточка удалена.' })
+        res.status(200).send({ message: 'Карточка удалена.' });
       }
     })
     .catch((err) => {
@@ -42,11 +42,11 @@ const deleteCards = (req, res, next) => {       //Удаляем карточк�
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные.'));
       }
-      next(err)
+      next(err);
     });
 };
 
-const likedCards = (req, res, next) => {                //Лайк на карточку
+const likedCards = (req, res, next) => { // Лайк на карточку
   Card.findByIdAndUpdate(
     req.params._id,
     { $addToSet: { likes: req.user._id } },
@@ -65,7 +65,7 @@ const likedCards = (req, res, next) => {                //Лайк на карт
     });
 };
 
-const dislikeCards = (req, res, next) => {              // Удаяем лайк
+const dislikeCards = (req, res, next) => { // Удаяем лайк
   Card.findByIdAndUpdate(
     req.params._id,
     { $pull: { likes: req.user._id } }, // убрать _id из массива

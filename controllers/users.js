@@ -8,11 +8,15 @@ const ConflictError = require('../errors/ConflictError');
 
 const { JWT_SECRET = 'DEFAULT_JWT' } = process.env;
 
-const postUser = (req, res, next) => {              // Создаем пользователя
-  const { name, about, avatar, email, password } = req.body;
+const postUser = (req, res, next) => { // Создаем пользователя
+  const {
+    name, about, avatar, email,
+  } = req.body;
   bcrypt.hash(req.body.password, 10)
     .then((hash) => {
-      return User.create({ name, about, avatar, email, password: hash });
+      User.create({
+        name, about, avatar, email, password: hash,
+      });
     })
     .then((data) => res.status(201).send(data))
     .catch((err) => {
@@ -27,26 +31,7 @@ const postUser = (req, res, next) => {              // Создаем польз
     });
 };
 
-// const postUser = (req, res, next) => {              // Создаем пользователя
-//   try {
-//     const { name, about, avatar, email, password } = req.body;
-//     bcrypt.hash(req.body.password, 10)
-//       .then((hash) => {
-//         const user = User.create({ name, about, avatar, email, password: hash });
-//         res.status(200).send(user);
-//       });
-//   } catch (err) {
-//     if (err.name === 'MongoError' && err.code === 11000) {
-//       next(new ConflictError('Пользователь с данным email уже существует'));
-//     }
-//     if (err.name === 'ValidationError') {
-//       next(new BadRequest('Введены некорректные данные!'));
-//     }
-//     next(err);
-//   }
-// };
-
-const getUser = async (req, res, next) => {       // Получаем всех пользователей
+const getUser = async (req, res, next) => { // Получаем всех пользователей
   try {
     const user = await User.find({});
 
@@ -56,7 +41,7 @@ const getUser = async (req, res, next) => {       // Получаем всех �
   }
 };
 
-const getUserId = (req, res, next) => {         // Получаем пользоватея по ID
+const getUserId = (req, res, next) => { // Получаем пользоватея по ID
   const { _id } = req.params;
   User.findById(_id)
     .orFail(new Error('NotFound'))
@@ -72,7 +57,7 @@ const getUserId = (req, res, next) => {         // Получаем пользо
     });
 };
 
-const updateProfile = async (req, res, next) => {           // Обновление профия
+const updateProfile = async (req, res, next) => { // Обновление профия
   try {
     const { name, about, avatar } = req.body;
 
@@ -90,7 +75,7 @@ const updateProfile = async (req, res, next) => {           // Обновлен�
   }
 };
 
-const updateAvatar = async (req, res, next) => {              // Обновление аватара
+const updateAvatar = async (req, res, next) => { // Обновление аватара
   try {
     const { avatar } = req.body;
 
@@ -120,7 +105,7 @@ const login = (req, res, next) => {
         next(new LoginError('передан неверный логин или пароль.'));
       }
       next(err);
-    })
+    });
 };
 
 const getProfile = (req, res, next) => {
