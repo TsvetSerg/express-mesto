@@ -4,13 +4,13 @@ const LoginError = require('../errors/loginError');
 const { JWT_SECRET = 'DEFAULT_JWT' } = process.env;
 
 module.exports = (req, res, next) => {
-  const { autoriz } = req.headers;
+  const { authorization } = req.headers;
 
-  if (!autoriz || !autoriz.startsWith('Bearer ')) {
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     throw new LoginError('Необходима авторизация');
   }
 
-  const token = autoriz.replace('Bearer ', '');
+  const token = authorization.replace('Bearer ', '');
   let payload;
   try {
     payload = jwt.verify(token, JWT_SECRET);

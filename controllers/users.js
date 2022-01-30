@@ -18,9 +18,10 @@ const postUser = (req, res, next) => { // Создаем пользовател�
         name, about, avatar, email, password: hash,
       });
     })
-    .then((data) => res.status(201).send(data))
+    .then(() => res.status(200).send({
+      name, about, avatar, email,
+    }))
     .catch((err) => {
-      // console.log(err)
       if (err.name === 'MongoServerError' && err.code === 11000) {
         next(new ConflictError('Пользователь с данным email уже существует'));
       }
