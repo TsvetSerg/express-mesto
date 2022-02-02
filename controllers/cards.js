@@ -2,6 +2,7 @@ const Card = require('../models/card');
 // const mongoose = require('mongoose');
 const NotFoundError = require('../errors/not-found');
 const BadRequest = require('../errors/BadRequest');
+const DeletError = require('../errors/DeleteCardError');
 
 const postCards = async (req, res, next) => { // Создаем картооочку
   const { name, link } = req.body;
@@ -33,6 +34,8 @@ const deleteCards = (req, res, next) => { // Удаляем карточку
       if (req.user._id.toString() === card.owner.toString()) {
         card.remove();
         res.status(200).send({ message: 'Карточка удалена.' });
+      } else {
+        throw new Error('AccessError');
       }
     })
     .catch((err) => {
@@ -41,6 +44,9 @@ const deleteCards = (req, res, next) => { // Удаляем карточку
       }
       if (err.name === 'CastError') {
         next(new BadRequest('Переданы некорректные данные.'));
+      }
+      if (err.message === 'AccessError') {
+        next(new DeletError('Вы не можете удалить чужую карточку.'));
       }
       next(err);
     });
