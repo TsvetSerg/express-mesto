@@ -1,8 +1,0 @@
-.popup_opened {
-  display: flex;
-  max-height: 100%;
-  opacity: 1;
-  transition: opacity 300ms;
-}
-
-
